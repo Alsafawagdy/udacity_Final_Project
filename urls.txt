@@ -1,1 +1,2 @@
 URL to your public GitHub repository [URL01]:https://github.com/Alsafawagdy/udacity_Final_Project
+Public URL for your S3 Bucket  [URL02]:http://acs.amazonaws.com/groups/global/AllUsers

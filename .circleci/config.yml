@@ -169,7 +169,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment     
+      # - destroy-environment     
 
   configure-infrastructure:
     docker:
@@ -190,7 +190,7 @@ jobs:
           name: Configure server
           command: |
              ansible-playbook .circleci/ansible/configure-server.yml -i .circleci/ansible/inventory.txt
-      - destroy-environment      
+      # - destroy-environment      
 
   run-migrations:
     docker:
@@ -212,7 +212,7 @@ jobs:
               # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
               curl https://kvdb.io/2ZC1YaRZKYJrkB45ZpmYmo/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi 
-      - destroy-environment       
+      # - destroy-environment       
 
   deploy-frontend:
     docker:
@@ -245,7 +245,7 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment    
+      # - destroy-environment    
                     
   deploy-backend:
     docker:

@@ -261,6 +261,7 @@ jobs:
           command: |
             sudo apt-get install tar gzip -y
             sudo apt-get update && sudo apt-get install -yy less
+            sudo apt-get install -y npm
       - run:
           name: Deploy backend
           command: |

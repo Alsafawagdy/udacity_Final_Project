@@ -249,20 +249,9 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/python:3.10
+      - image: mareimorsy/aws-node
     steps:
       - checkout
-      - run: sudo apt-get install tar gzip -y
-      - run: 
-          name: Install aws_cli
-          command: |
-            #test
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install    
-      - install_ansible
-      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["d9:46:b8:ba:57:f0:63:ef:97:56:60:cb:4d:1f:9b:3a"]
       - attach_workspace:
@@ -272,21 +261,15 @@ jobs:
       - run:
           name: Deploy backend
           command: |
+            export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            echo $TYPEORM_HOST >> .circleci/ansible/inventory.txt
             cd backend
-            npm install
-      
-            cd backend
+            npm i
             npm run build
-            tar -czvf artifact.tar.gz dist/* package*
-            cd .. 
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-      
-            export TYPEORM_MIGRATIONS_DIR=./migrations
-            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*.ts
-            cd .circleci/ansible
-            echo "Contents  of the inventory file is -------"
-            cat inventory.txt
+            tar -czf artifact.tar.gz dist/* package*
+            cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/artifact.tar.gz
+            ls ../.circleci/ansible/roles/deploy/
+            cd ../.circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
 

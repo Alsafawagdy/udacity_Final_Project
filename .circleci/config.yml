@@ -145,14 +145,14 @@ jobs:
           name: Install tar utility
           command: |
             yum install -y tar gzip
-      # - run:
-      #     name: Ensure back-end infrastructure exists
-      #     command: |
-            # aws cloudformation deploy \
-            #   --template-file .circleci/files/backend.yml \
-            #   --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-            #   --tags project=udapeople
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -252,16 +252,28 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      # Add ssh keys with fingerprint
-      # attach workspace
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
+      - add_ssh_keys:
+          fingerprints: ["d9:46:b8:ba:57:f0:63:ef:97:56:60:cb:4d:1f:9b:3a"]
+      - attach_workspace:
+          at: ~/
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       # your code here
       - run:
           name: Deploy backend
           command: |
-            # your code here
+            export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            echo $TYPEORM_HOST >> .circleci/ansible/inventory.txt
+            cd backend
+            npm i
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/artifact.tar.gz
+            ls ../.circleci/ansible/roles/deploy/
+            cd ../.circleci/ansible
+            ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:

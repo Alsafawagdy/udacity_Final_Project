@@ -291,7 +291,7 @@ jobs:
             # export API_URL="http://${BACKEND_IP}:3030"
             # echo "API_URL = ${API_URL}"
             URL="http://www.google.com"
-            if curl "${URl}"
+            if curl -s "${URl}"
             
             then
                 exit 0

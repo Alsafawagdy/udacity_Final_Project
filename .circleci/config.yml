@@ -247,30 +247,41 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # - destroy-environment    
                     
-  deploy-backend:
+  deploy-backend: # create deploy-backend
     docker:
-      - image: mareimorsy/aws-node
+      - image: cimg/python:3.10
     steps:
       - checkout
+      - run: sudo apt-get install tar gzip -y
+      - run: 
+          name: Install aws_cli
+          command: |
+            #test
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install    
+      - install_ansible
+      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["d9:46:b8:ba:57:f0:63:ef:97:56:60:cb:4d:1f:9b:3a"]
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-deps]
       - run:
-          name: Deploy backend
+          name: Install npm
           command: |
             cd backend
-            npm i
+            npm install
+      - run:
+          name: Package backend
+          command: |
+            cd backend
             npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            # ansible-playbook -i inventory.txt deploy-backend.yml
+            tar -czvf artifact.tar.gz dist/* package*
+            cd .. 
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
             
       # - destroy-environment 
 

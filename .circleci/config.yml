@@ -274,46 +274,7 @@ jobs:
             
       # - destroy-environment 
 
-  # smoke-test:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           yum install -y curl
-  #     - run:
-  #         name: Frontend smoke test.
-  #         command: |
-  #           URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"            
-  #           echo ${URL} 
-  #           if curl -s ${URL} | grep "Welcome"
-  #           then
-  #             exit 0
-  #           else
-  #             exit 1
-  #           fi 
-      # - run:
-      #     name: Backend smoke test.
-      #     command: |
-      #       export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            
-      #       # URL="http://$BACKEND_PUBLIC_IP:3030/api/status"
-      #       URL="http://g00gle.com"
-      #       if curl -s --head ${URL}
-      #       then
-      #         echo "It worked!"
-      #         exit 0
-      #       else
-      #         echo "Rolling Back"
-      #         exit 1
-      #       fi
-      # - destroy-environment 
-      # - revert-migrations  
-      # Here's where you will add some code to rollback on failure  
-
-  cloudfront-update:
+  smoke-test:
     docker:
       - image: amazon/aws-cli
     steps:
@@ -322,17 +283,56 @@ jobs:
           name: Install dependencies
           command: |
             yum install -y curl
-            export OLD_WORKFLOW_ID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-            echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
-            curl https://kvdb.io/Up68KQvVZCMC32AM4i2mJR/old_workflow_id-2 -d "${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
-          name: Update cloudfront distribution
+          name: Frontend smoke test.
           command: |
-            aws cloudformation deploy \
-            --template-file .circleci/files/cloudfront.yml \
-            --stack-name InitialStack \
-            --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            --tags project=udapeople
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              exit 0
+            else
+              exit 1
+            fi 
+      - run:
+          name: Backend smoke test.
+          command: |
+            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            
+            # URL="http://$BACKEND_PUBLIC_IP:3030/api/status"
+            URL="http://g00gle.com"
+            if curl -s --head ${URL}
+            then
+              echo "It worked!"
+              exit 0
+            else
+              echo "Rolling Back"
+              exit 1
+            fi
+      - destroy-environment 
+      - revert-migrations  
+      Here's where you will add some code to rollback on failure  
+
+  # cloudfront-update:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           yum install -y curl
+  #           export OLD_WORKFLOW_ID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
+  #           echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
+  #           curl https://kvdb.io/Up68KQvVZCMC32AM4i2mJR/old_workflow_id-2 -d "${CIRCLE_WORKFLOW_ID:0:7}"
+  #     - run:
+  #         name: Update cloudfront distribution
+  #         command: |
+  #           aws cloudformation deploy \
+  #           --template-file .circleci/files/cloudfront.yml \
+  #           --stack-name InitialStack \
+  #           --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+  #           --tags project=udapeople
       # Here's where you will add some code to rollback on failure  
 
 # cleanup:
@@ -389,9 +389,9 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          # requires: [smoke-test]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]

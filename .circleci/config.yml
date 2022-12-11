@@ -329,7 +329,7 @@ jobs:
     steps:
       - checkout
       # - install_awscli
-      - install_nodejs
+      # - install_nodejs
       - run:
           name: "Install curl"
           command: |

@@ -1,20 +1,26 @@
 ---
-
-- name: "Add Node.js"
-  become: true
-  shell: |
-    curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-- name: "Install Node.js 13"
+- name: "installing npm"
   become: true
   apt:
-    name: ["nodejs"]
-    state: latest
+    name: npm
     update_cache: yes
+    state: latest
 
-- name: "Install PM2 Globally"
+- name: Install nvm
+  become: true
+  npm:
+    name: n
+    global: yes
+    
+- name: install nodejs v13.8.0
+  become: true
+  command: n 13.8.0
+
+- name: "Install PM2"
   npm:
     name: pm2
     global: yes
+    state: present
 
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"

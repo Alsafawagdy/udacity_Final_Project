@@ -1,14 +1,26 @@
 version: 2.1
 
 commands:
-
+  install_awscli:
+    description: install AWS-CLI
+    steps:
+      - run:
+          name: Install AWS-CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
   install_ansible: #we will install ansible 
     description: Install Ansible
     steps:
       - run:
           name: Install Ansible
           command: |
-            python3 -m pip install --user ansible        
+            python3 -m pip install --user ansible 
+            sudo apt update
+             sudo apt install software-properties-common -y
+             sudo add-apt-repository --yes --update ppa:ansible/ansible
+             sudo apt install ansible -y       
 
   install_nodejs:  #we will install nodejs 13.8.0
     description: Install Node.js 13.8.0
@@ -252,6 +264,7 @@ jobs:
             # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             # unzip awscliv2.zip
             # sudo ./aws/install 
+            
       - run:
           name: Get backend url
           command: |
@@ -276,14 +289,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
-      - run: 
-          name: Install aws_cli
-          command: |
-            #test
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install    
+      - install_awscli  
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
@@ -291,7 +297,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          keys: [backend-deps]
+          keys: [backend-build]
       - run:
           name: Install npm
           command: |
@@ -322,6 +328,8 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - install_awscli
+      - install_nodejs
       - run:
           name: "Install curl"
           command: |

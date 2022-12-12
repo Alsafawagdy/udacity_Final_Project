@@ -261,19 +261,15 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # sudo apt-get update && sudo apt-get install -yy less
-            # curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            # unzip awscliv2.zip
-            # sudo ./aws/install 
-            
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
+            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            echo "API_URL=http://$BACKEND_PUBLIC_IP:3030" 
+            # Build the frontend
+            cd frontend
+            echo "API_URL=http://$BACKEND_PUBLIC_IP:3030" > .env
+            npm install
+            npm run build:prod
+            # aws s3 sync dist s3://udapeople-project
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:4} --recursive
       - run:
           name: Deploy frontend objects
           command: |

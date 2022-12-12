@@ -269,7 +269,7 @@ jobs:
             npm install
             npm run build:prod
             # aws s3 sync dist s3://udapeople-project
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:4} --recursive
+            aws s3 cp dist s3://udapeople-17b5 --recursive
      
       # - destroy-environment    
                     
@@ -279,7 +279,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
-      - install_awscli  
+      # - install_awscli  
       - install_ansible
       - install_nodejs
       - add_ssh_keys:

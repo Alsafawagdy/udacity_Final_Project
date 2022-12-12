@@ -77,12 +77,7 @@ commands:
             event: fail
             channel: $SLACK_DEFAULT_CHANNEL
             template: basic_fail_1
-  notify_on_success:
-      steps:
-        - slack/notify:
-            event: pass
-            channel: $SLACK_DEFAULT_CHANNEL
-            template: success_tagged_deployment_1
+
 jobs:
   build-frontend:
     docker:
@@ -371,7 +366,6 @@ jobs:
       #         exit 1
       #       fi 
             
-      - notify_on_failure
       - destroy_environment
         
 
@@ -439,7 +433,7 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requx ires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [master]

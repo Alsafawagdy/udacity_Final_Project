@@ -280,7 +280,7 @@ jobs:
       - checkout
       - run: sudo apt-get install tar gzip -y
       # - install_awscli  
-      - install_ansible
+      # - install_ansible
       - install_nodejs
       - add_ssh_keys:
           fingerprints: ["d9:46:b8:ba:57:f0:63:ef:97:56:60:cb:4d:1f:9b:3a"]

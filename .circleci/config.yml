@@ -255,11 +255,11 @@ jobs:
       - image: mareimorsy/aws-node
     steps:
       - checkout
-      - run: sudo apt-get install tar gzip -y
+      # - run: sudo apt-get install tar gzip -y
       - restore_cache:
           keys: [frontend-build]
       - run:
-          name: Install dependencies
+          name: Deploy frontend objects
           command: |
             export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             echo "API_URL=http://$BACKEND_PUBLIC_IP:3030" 
@@ -270,14 +270,7 @@ jobs:
             npm run build:prod
             # aws s3 sync dist s3://udapeople-project
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:4} --recursive
-      - run:
-          name: Deploy frontend objects
-          command: |
-            cd frontend
-            npm install
-            npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:4}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:4} --recursive
+     
       # - destroy-environment    
                     
   deploy-backend: # create deploy-backend

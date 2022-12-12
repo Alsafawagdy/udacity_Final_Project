@@ -351,6 +351,7 @@ jobs:
               echo "Rolling Back"
               exit 1
             fi
+      - destroy-environment
       # - run:
       #     name: Frontend smoke test.
       #     command: |
@@ -363,7 +364,7 @@ jobs:
       #         exit 1
       #       fi 
             
-      - destroy_environment
+     
         
 
   # cloudfront-update:

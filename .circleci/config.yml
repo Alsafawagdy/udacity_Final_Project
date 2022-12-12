@@ -180,22 +180,22 @@ jobs:
           name: Install tar utility
           command: |
             yum install -y tar gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:4}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:4}"  \
-              --tags project=udapeople
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:4} \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:4}" 
+      # - run:
+      #     name: Ensure back-end infrastructure exists
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/files/backend.yml \
+      #         --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:4}" \
+      #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:4}"  \
+      #         --tags project=udapeople
+      # - run:
+      #     name: Ensure front-end infrastructure exist
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/files/frontend.yml \
+      #         --tags project=udapeople \
+      #         --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:4} \
+      #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:4}" 
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -225,11 +225,6 @@ jobs:
       - run:
           name: Configure server
           command: |
-            # ls
-            # pwd
-            cd .circleci/ansible
-            aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
-            cat inventory.txt
             ansible-playbook .circleci/ansible/configure-server.yml -i .circleci/ansible/inventory.txt
       # - destroy-environment      
 

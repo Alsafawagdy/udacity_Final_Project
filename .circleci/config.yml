@@ -239,6 +239,8 @@ jobs:
       - image: cimg/node:19.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
           command: |
@@ -246,14 +248,15 @@ jobs:
             npm install
             # Run and save the migration output
             npm run migrations > migrations_dump.txt
-      # - run:
-      #     name: Send migration results to memstash
-      #     command: |
-      #       if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-      #       then
-      #         # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-      #         curl https://kvdb.io/Ea61qmNDn5FQ2NoYmHGhJJ/migration_${CIRCLE_WORKFLOW_ID:0:4}  -d '1'
-      #       fi 
+            cat migrations_dump.txt
+      - run:
+          name: Send migration results to memstash
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
+              curl https://kvdb.io/Ea61qmNDn5FQ2NoYmHGhJJ/migration_${CIRCLE_WORKFLOW_ID:0:4}  -d '1'
+            fi 
       # - destroy-environment       
 
   deploy-frontend:

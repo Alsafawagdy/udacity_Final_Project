@@ -1,16 +1,16 @@
 version: 2.1
 
 commands:
-  install_awscli:
-    description: install AWS-CLI
-    steps:
-      - run:
-          name: Install AWS-CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/instal
+  # install_awscli:
+  #   description: install AWS-CLI
+  #   steps:
+  #     - run:
+  #         name: Install AWS-CLI
+  #         command: |
+  #           sudo apt-get update && sudo apt-get install -yy less
+  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  #           unzip awscliv2.zip
+  #           sudo ./aws/instal
 
   install_ansible: #we will install ansible 
     description: Install Ansible
@@ -315,7 +315,7 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
-      - install_awscli  
+      # - install_awscli  
       - install_ansible
       - install_nodejs
       - add_ssh_keys:

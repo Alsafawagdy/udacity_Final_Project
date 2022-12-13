@@ -315,8 +315,7 @@ jobs:
       - run:
           name: "Install curl"
           command: |
-            yum install -y curl
-           
+            yum install -y curl           
       - run:
           name: Backend smoke test.
           command: |
@@ -342,8 +341,6 @@ jobs:
             fi 
       - destroy-environment 
       - revert-migrations
-     
-        
 
   # cloudfront-update:
   #   docker:

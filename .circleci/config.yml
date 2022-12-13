@@ -280,7 +280,7 @@ jobs:
                     
   deploy-backend: # create deploy-backend
     docker:
-      - image: cimg/python:3.10
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
@@ -303,8 +303,7 @@ jobs:
             export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
             export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
-            ansible-playbook -i inventory.txt deploy-backend.yml | sh
-
+            ansible-playbook deploy-backend.yml -i inventory.txt
 
             # export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             # echo $TYPEORM_HOST >> .circleci/ansible/inventory.txt

@@ -1,10 +1,5 @@
 version: 2.1
 
-# orbs:
-#   ansible-playbook: orbss/ansible-playbook@0.0.5
-
-
-
 commands:
   install_awscli:
     description: install AWS-CLI
@@ -12,9 +7,11 @@ commands:
       - run:
           name: Install AWS-CLI
           command: |
+            sudo apt-get update && sudo apt-get install -yy less
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo ./aws/install
+            sudo ./aws/instal
+
   install_ansible: #we will install ansible 
     description: Install Ansible
     steps:
@@ -296,7 +293,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env

@@ -303,7 +303,8 @@ jobs:
             export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
             export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
-            ansible-playbook deploy-backend.yml -i inventory.txt
+            apk add --update ansible
+            ansible-playbook -i  inventory.txt deploy-backend.yml
 
             # export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             # echo $TYPEORM_HOST >> .circleci/ansible/inventory.txt
@@ -322,7 +323,7 @@ jobs:
             # cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/artifact.tar.gz
             # ls ../.circleci/ansible/roles/deploy/
             # cd ../.circleci/ansible
-            # ansible-playbook -i 3.82.251.15 inventory.txt deploy-backend.yml
+            # ansible-playbook -i  inventory.txt deploy-backend.yml
             
       # - destroy-environment 
 

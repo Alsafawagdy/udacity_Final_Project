@@ -305,35 +305,13 @@ jobs:
             cd .circleci/ansible
             sudo apt update  && sudo apt upgrade
             ansible-playbook -i  inventory.txt deploy-backend.yml
-
-            # export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            # echo $TYPEORM_HOST >> .circleci/ansible/inventory.txt
-            # cd backend
-            # npm i
-            # npm run build
-            # echo "TYPEORM_ENTITIES=./dist/modules/domain/**/*.entity{.ts,.js}" > .env
-            # echo "TYPEORM_HOST=${TYPEORM_HOST}" >> .env
-            # echo "TYPEORM_PORT=${TYPEORM_PORT}" >> .env
-            # echo "TYPEORM_USERNAME=${TYPEORM_USERNAME}" >> .env
-            # echo "TYPEORM_PASSWORD=${TYPEORM_PASSWORD}" >> .env
-            # echo "TYPEORM_DATABASE=${TYPEORM_DATABASE}" >> .env
-            # echo "TYPEORM_MIGRATIONS_DIR=./dist/migrations" >> .env
-            # echo "TYPEORM_MIGRATIONS=./dist/migrations/*.ts" >> .env
-            # tar -czf artifact.tar.gz dist/* package* .env
-            # cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/artifact.tar.gz
-            # ls ../.circleci/ansible/roles/deploy/
-            # cd ../.circleci/ansible
-            # ansible-playbook -i  inventory.txt deploy-backend.yml
-            
       # - destroy-environment 
 
-  smoke-test:
+  smoke-test: # createe smoke-test
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
-      # - install_awscli
-      # - install_nodejs
       - run:
           name: "Install curl"
           command: |
@@ -342,31 +320,28 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            
-            URL="http://$BACKEND_PUBLIC_IP:3030/api/status"
-            # URL="http://g00gle.com"
-            if curl -s --head ${URL}
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
             then
-              echo "It worked!"
+                exit 0
+            else
+                exit 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
               exit 0
             else
-              echo "Rolling Back"
               exit 1
-            fi
-      - destroy-environment
-      # - run:
-      #     name: Frontend smoke test.
-      #     command: |
-      #       URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:4}.s3-website-us-east-1.amazonaws.com"            
-      #       echo ${URL} 
-      #       if curl -s ${URL} | grep "Welcome"
-      #       then
-      #         exit 0
-      #       else
-      #         exit 1
-      #       fi 
-            
+            fi 
+      - destroy-environment 
+      - revert-migrations
      
         
 

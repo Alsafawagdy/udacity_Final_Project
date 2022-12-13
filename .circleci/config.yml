@@ -48,9 +48,9 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:4}
-            aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
-            aws cloudformation delete-stack --stack-name frontend-<< parameters.Workflow_ID >>
+            # aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:4}
+            # aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
+            # aws cloudformation delete-stack --stack-name frontend-<< parameters.Workflow_ID >>
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -389,7 +389,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-17b5" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             if curl -s "${API_URL}/api/status" | grep "ok"
@@ -401,7 +401,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"            
+            URL="http://udapeople-17b5.s3-website-us-east-1.amazonaws.com"            
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then

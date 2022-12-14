@@ -439,7 +439,7 @@ jobs:
               --stack-name InitialStack
       # Here's where you will add some code to rollback on failure  
 
-cleanup:
+  cleanup:
     docker:
       - image: amazon/aws-cli
     steps:

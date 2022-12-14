@@ -392,7 +392,6 @@ jobs:
           name: "Install curl"
           command: |
             yum install -y curl
-           
       - run:
           name: Backend smoke test.
           command: |

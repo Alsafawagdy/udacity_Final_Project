@@ -338,8 +338,10 @@ jobs:
             export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
             export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
+            cat inventory.txt
             sudo apt update  && sudo apt upgrade
             ansible-playbook -i  inventory.txt deploy-backend.yml
+
       # - destroy-environment 
 
   # smoke-test: # createe smoke-test

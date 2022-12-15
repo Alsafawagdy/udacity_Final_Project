@@ -421,7 +421,6 @@ jobs:
               --template-file .circleci/files/cloudfront.yml \
               --parameter-overrides WorkflowID="17b5" \
               --stack-name InitialStack
-
       # Here's where you will add some code to rollback on failure  
 
   cleanup:

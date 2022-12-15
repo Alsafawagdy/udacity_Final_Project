@@ -408,7 +408,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            export OLD_WORKFLOW_ID=udapeople-alsafafinal
+            export OLD_WORKFLOW_ID=17b5
             echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
             curl https://kvdb.io/${KVDB_BUCKET}/old_workflow_id -d "${OLD_WORKFLOW_ID}"
       - run:

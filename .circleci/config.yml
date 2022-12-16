@@ -419,7 +419,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:4}" \
-              --stack-name Initialstack2
+              --stack-name Initialstack
 
           
 

@@ -241,7 +241,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            # export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export TYPEORM_HOST=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             cd backend
             npm install
             npm run premigrations
@@ -331,41 +331,7 @@ jobs:
 
       # - destroy-environment 
 
-  # smoke-test: # createe smoke-test
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: "Install curl"
-  #         command: |
-  #           yum install -y curl           
-  #     - run:
-  #         name: Backend smoke test.
-  #         command: |
-  #           export BACKEND_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "API_URL = ${API_URL}"
-  #           if curl "${API_URL}/api/status" | grep "ok"
-  #           then
-  #               exit 0
-  #           else
-  #               exit 1
-  #           fi
-  #     - run:
-  #         name: Frontend smoke test.
-  #         command: |
-  #           URL="http://udapeople-17b5.s3-website-us-east-1.amazonaws.com"            
-  #           echo ${URL} 
-  #           if curl -s ${URL} | grep "Welcome"
-  #           then
-  #             exit 0
-  #           else
-  #             exit 1
-  #           fi 
-  #     - destroy-environment 
-  #     - revert-migrations
-  smoke-test: 
+  smoke-test: # createe smoke-test
     docker:
       - image: amazon/aws-cli
     steps:
@@ -373,14 +339,14 @@ jobs:
       - run:
           name: "Install curl"
           command: |
-            yum install -y curl
+            yum install -y curl           
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-17b5" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --region us-east-1 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            if curl -s "${API_URL}/api/status" | grep "ok"
+            if curl "${API_URL}/api/status" | grep "ok"
             then
                 exit 0
             else
@@ -397,8 +363,9 @@ jobs:
             else
               exit 1
             fi 
-      - destroy-environment 
-      - revert-migrations
+      # - destroy-environment 
+      # - revert-migrations
+  
 
   cloudfront-update:
     docker:
@@ -459,25 +426,25 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      - run-migrations
+          # requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:

@@ -53,26 +53,26 @@ commands:
             aws cloudformation delete-stack --stack-name frontend-<< parameters.Workflow_ID >>
 
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
+    description: Revert the last migration
     parameters:
-       Workflow_ID:
+      Workflow_ID:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:4}    
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
             echo "$SUCCESS"
-            if(( $SUCCESS==1 )); 
+            # Logic for reverting the database state
+            if (( $SUCCESS == 1 ));
             then
-              cd ~/projects/backend
+              cd ~/project/backend
               npm install
               npm run migration:revert
             fi
-
+            
 
 jobs:
   build-frontend:
@@ -397,15 +397,9 @@ jobs:
 
   cleanup:
     docker:
-      - image: amazon/aws-cli
+      - image: mareimorsy/aws-node
     steps:
       - checkout
-      # - run:
-      #     name: Get old stack workflow id
-      #     command: |
-      #       # your code here
-      #       export OldWorkflowID="the id here"
-      #       export STACKS=[] #put the list of stacks here
       - run:
           name: Remove old stacks and files
           command: |
@@ -421,37 +415,36 @@ jobs:
               aws cloudformation delete-stack --stack-name "backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "frontend-${OldWorkflowID}"
             fi
-            
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend , deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend , deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      - cleanup
+          # requires: [cloudfront-update]
